@@ -73,9 +73,9 @@ map <unique> <D-R> :RunRSpecSingleExample<CR>
 command DebugRSpecExamples                 call s:debug_rspec_examples()
 command DebugRSpecSingleExample            call s:debug_rspec_single_example()
 command DebugSetBreakpointAtCurrentLine    call s:debug_set_breakpoint_at_current_line()
-map <unique> <D-d>     :DebugRSpecExamples<CR>
-map <unique> <D-D>     :DebugRSpecSingleExample<CR>
-map <unique> <Leader>b :DebugSetBreakpointAtCurrentLine<CR>
+map <unique> <D-d>      :DebugRSpecExamples<CR>
+map <unique> <D-D>      :DebugRSpecSingleExample<CR>
+map <unique> <Leader>bb :DebugSetBreakpointAtCurrentLine<CR>
 
 "
 " Debug Inspect Mappings
