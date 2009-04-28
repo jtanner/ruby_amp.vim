@@ -86,8 +86,8 @@ nmap <unique> <D-i> :DebugInspectWithPrettyPrint<CR>
 vmap <unique> <D-i> :DebugVisualInspectWithPrettyPrint<CR>
 command DebugInspectAsString              call DebugInspectAsString(0)
 command -range DebugVisualInspectAsString call DebugInspectAsString(1)
-nmap <unique> <Leader>is :DebugInspectAsString<CR>
-vmap <unique> <Leader>is :DebugVisualInspectAsString<CR>
+nmap <unique> <D-I> :DebugInspectAsString<CR>
+vmap <unique> <D-I> :DebugVisualInspectAsString<CR>
 
 "
 " Misc Mappings
