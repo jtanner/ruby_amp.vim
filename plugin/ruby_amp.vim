@@ -28,11 +28,11 @@ endfunction
 "
 
 function s:debug_rspec_examples()
-  call s:ruby_amp_command_in_terminal("debug_rspec_examples")
+  call s:ruby_amp_command_in_terminal("debug_rspec_examples", {'exit_when_done':1})
 endfunction
 
 function s:debug_rspec_single_example()
-  call s:ruby_amp_command_in_terminal("debug_rspec_single_example")
+  call s:ruby_amp_command_in_terminal("debug_rspec_single_example", {'exit_when_done':1})
 endfunction
 
 function s:debug_set_breakpoint_at_current_line()
@@ -133,19 +133,17 @@ function s:ruby_amp_script(command, options)
     let envs .= key ."=". substitute(shellescape(env_variables[key]), "\\\\\n", "\n", 'g') ." "
   endfor
 
+  let exit = ""
+  if has_key(a:options, 'exit_when_done') && remove(a:options, 'exit_when_done')
+    let exit = ";exit"
+  endif
+
   let args = ""
   for key in keys(a:options)
     let args .= " --". key ." '". a:options[key] ."'"
   endfor
 
-  return stdin . envs ." ruby ". shellescape($HOME ."/.vim/ruby/ruby_amp/script/run") ." -c ". a:command . args
-endfunction
-
-function s:local_ruby_amp_command(command_name, is_visual)
-  call s:setup_ruby_amp(a:is_visual)
-  ruby << EOF
-    RubyAMP::Commands.send(VIM.evaluate('a:command_name'))
-EOF
+  return stdin . envs ." ruby ". shellescape($HOME ."/.vim/ruby/ruby_amp/script/run") ." -c ". a:command . args . exit
 endfunction
 
 function s:run_in_terminal(script)
@@ -181,23 +179,6 @@ function s:get_selection()
     let line= line + 1
   endwhile
   return selection
-endfunction
-
-function s:setup_ruby_amp(is_visual)
-ruby << EOF
-  if VIM.evaluate("a:is_visual") == "1"
-    selection = VIM.evaluate("s:get_selection()")
-    ENV['TM_SELECTED_TEXT'] = selection
-  else
-    ENV['TM_SELECTED_TEXT'] = nil
-    require 'stringio'
-    $stdin = StringIO.new(VIM::Buffer.current.line)
-  end
-  ENV['TM_LINE_NUMBER'] = VIM::Buffer.current.line_number.to_s
-  ENV['TM_COLUMN_NUMBER'] = VIM.evaluate("col('.')").to_s
-  ENV['TM_FILEPATH'] = VIM.evaluate("expand('%:p')")
-  require "#{ENV['HOME']}/.vim/ruby/ruby_amp/lib/ruby_amp.rb"
-EOF
 endfunction
 
 
