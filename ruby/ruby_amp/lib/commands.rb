@@ -24,6 +24,13 @@ module RubyAMP
       end
     end
 
+    def debug_quit_debugger
+      remote_debugger do |d|
+        d.command("quit")
+        print "Debugger Quit"
+      end
+    end
+
     def debug_show_breakpoints
       #require "#{ENV["TM_BUNDLE_SUPPORT"]}/lib/ruby_amp.rb"
       #require "#{ENV["TM_BUNDLE_SUPPORT"]}/lib/ruby_tm_helpers.rb"
@@ -59,9 +66,26 @@ module RubyAMP
       end
     end
 
+    def debug_copy_inspection_to_clipboard_as_pretty_print
+      remote_debugger do |d|
+        what = RubyAMP::Inspect.get_selection
+        pbcopy(d.evaluate(what, :current, :pp))
+        print "Copied value of #{what} to clipboard"
+      end
+    end
+
+    def debug_copy_inspection_to_clipboard_as_string
+      remote_debugger do |d|
+        what = RubyAMP::Inspect.get_selection
+        pbcopy(d.evaluate(what, :current, :string))
+        print "Copied value of #{what} to clipboard"
+      end
+    end
+
     #
     # Rspec Run Commands
     #
+    
     def run_rspec_examples
       RubyAMP::Spec::Runner.new.run_file
     end

@@ -39,13 +39,36 @@ function s:debug_set_breakpoint_at_current_line()
   echo s:ruby_amp_command("debug_set_breakpoint_at_current_line")
 endfunction
 
-function DebugInspectWithPrettyPrint(is_visual)
+function s:debug_quit_debugger()
+  echo s:ruby_amp_command("debug_quit_debugger")
+endfunction
+
+function s:debug_inspect_with_pretty_print(is_visual)
   echo s:ruby_amp_command("debug_inspect_with_pretty_print", {'is_visual': a:is_visual})
 endfunction
 
-function DebugInspectAsString(is_visual)
+function s:debug_inspect_as_string(is_visual)
   echo s:ruby_amp_command("debug_inspect_as_string", {'is_visual': a:is_visual})
 endfunction
+
+let s:copy_inspections = [
+  \ ['As Pretty Print', 'debug_copy_inspection_to_clipboard_as_pretty_print'],
+  \ ['As String',       'debug_copy_inspection_to_clipboard_as_string'],
+  \ ['As YAML',         'debug_copy_inspection_to_clipboard_as_yaml']
+  \ ]
+fun s:copy_inspection(is_visual)
+  let choices = []
+  let i = 1
+  for inspection_choice in s:copy_inspections
+    let choices += [i .'. '. inspection_choice[0]]
+    let i += 1
+  endfor
+  let chosen_index = inputlist(['Debug copy inspection to clipboard'] + choices)
+  if chosen_index != 0 && chosen_index < len(s:copy_inspections)
+    let command = s:copy_inspections[chosen_index - 1][1]
+    echo s:ruby_amp_command(command, {'is_visual': a:is_visual})
+  endif
+endfun
 
 
 "
@@ -64,36 +87,45 @@ endfunction
 "
 command RunRSpecExamples      call s:run_rspec_examples()
 command RunRSpecSingleExample call s:run_rspec_single_example()
-map <unique> <D-r> :RunRSpecExamples<CR>
-map <unique> <D-R> :RunRSpecSingleExample<CR>
+map <D-r> :RunRSpecExamples<CR>
+map <D-R> :RunRSpecSingleExample<CR>
 
 "
 " Debug Mappings
 "
+command DebugAppServerInTerminalWindow     call s:debug_app_server_in_terminal_window()
 command DebugRSpecExamples                 call s:debug_rspec_examples()
 command DebugRSpecSingleExample            call s:debug_rspec_single_example()
 command DebugSetBreakpointAtCurrentLine    call s:debug_set_breakpoint_at_current_line()
-map <unique> <D-d>      :DebugRSpecExamples<CR>
-map <unique> <D-D>      :DebugRSpecSingleExample<CR>
-map <unique> <Leader>bb :DebugSetBreakpointAtCurrentLine<CR>
+command DebugQuitDebugger                  call s:debug_quit_debugger()
+map <D-d>      :DebugRSpecExamples<CR>
+map <D-D>      :DebugRSpecSingleExample<CR>
+map <Leader>bb :DebugSetBreakpointAtCurrentLine<CR>
+map <Leader>dq :DebugQuitDebugger<CR>
 
 "
 " Debug Inspect Mappings
 "
-command DebugInspectWithPrettyPrint              call DebugInspectWithPrettyPrint(0)
-command -range DebugVisualInspectWithPrettyPrint call DebugInspectWithPrettyPrint(1)
-nmap <unique> <D-i> :DebugInspectWithPrettyPrint<CR>
-vmap <unique> <D-i> :DebugVisualInspectWithPrettyPrint<CR>
-command DebugInspectAsString              call DebugInspectAsString(0)
-command -range DebugVisualInspectAsString call DebugInspectAsString(1)
-nmap <unique> <D-I> :DebugInspectAsString<CR>
-vmap <unique> <D-I> :DebugVisualInspectAsString<CR>
+command DebugInspectWithPrettyPrint              call s:debug_inspect_with_pretty_print(0)
+command -range DebugVisualInspectWithPrettyPrint call s:debug_inspect_with_pretty_print(1)
+nmap <D-i> :DebugInspectWithPrettyPrint<CR>
+vmap <D-i> :DebugVisualInspectWithPrettyPrint<CR>
+
+command DebugInspectAsString              call s:debug_inspect_as_string(0)
+command -range DebugVisualInspectAsString call s:debug_inspect_as_string(1)
+nmap <D-I> :DebugInspectAsString<CR>
+vmap <D-I> :DebugVisualInspectAsString<CR>
+
+command DebugCopyInspection              call s:copy_inspection(0)
+command -range DebugVisualCopyInspection call s:copy_inspection(1)
+nmap <Leader>cc :DebugCopyInspection<CR>
+vmap <Leader>cc :DebugVisualCopyInspection<CR>
 
 "
 " Misc Mappings
 "
 command ProjectTerminal call s:project_terminal()
-nnoremap <silent> <Leader>pp :ProjectTerminal<CR>
+map <silent> <Leader>pp :ProjectTerminal<CR>
 
 
 "
